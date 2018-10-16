@@ -1,0 +1,6 @@
+README.md
+galckito.egg-info/PKG-INFO
+galckito.egg-info/SOURCES.txt
+galckito.egg-info/dependency_links.txt
+galckito.egg-info/not-zip-safe
+galckito.egg-info/top_level.txt
