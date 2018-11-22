@@ -5,8 +5,8 @@ def gaussian_psf(pixelscale, angularFWHM, shape):
     FWHM = angularFWHM/pixelscale
     gaussian   = np.zeros(shape)
   
-    Xc = shape[0]/2
-    Yc = shape[1]/2
+    Xc = np.floor(shape[0]/2)
+    Yc = np.floor(shape[1]/2)
     
     sigma = FWHM/2.354
     for i in range(0, shape[0], 1):
@@ -24,8 +24,8 @@ def moffat_psf(pixelscale, angularFWHM, shape):
     a = FWHM/(2*(2**(1./beta) - 1))
     moffat   = np.zeros(shape)
   
-    Xc = shape[0]/2
-    Yc = shape[1]/2
+    Xc = np.floor(shape[0]/2)
+    Yc = np.floor(shape[1]/2)
     
     sigma = FWHM/2.354
     for i in range(0, shape[0], 1):

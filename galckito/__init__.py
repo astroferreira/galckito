@@ -5,3 +5,5 @@ from .factory import moffat_psf
 
 from .cosmocalc import cosmology
 from .rebbining import congrid
+
+from .image import IllustrisCube
