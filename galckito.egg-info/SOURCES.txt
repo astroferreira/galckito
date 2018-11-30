@@ -1,4 +1,12 @@
 README.md
+setup.py
+galckito/__init__.py
+galckito/constants.py
+galckito/cosmocalc.py
+galckito/dataviz.py
+galckito/factory.py
+galckito/image.py
+galckito/rebbining.py
 galckito.egg-info/PKG-INFO
 galckito.egg-info/SOURCES.txt
 galckito.egg-info/dependency_links.txt

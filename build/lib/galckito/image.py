@@ -1,16 +1,13 @@
 
 from .cosmocalc import cosmology
 from .constants import *
-from .utils import get
 
 from astropy.io import fits
-from astropy import units as u
-
 from scipy.ndimage import zoom
+
 
 import numpy as np
 import pandas as pd
-import json
 
 
 class IllustrisCube(object):
@@ -21,8 +18,6 @@ class IllustrisCube(object):
         self.mfmtk_path = mfmtk_path
 
         self.parse_path()
-
-        self.url = SUBHALO_URL.format(self.snapshot, self.subfind)
 
         if(self.mfmtk_path is not None):
             self.load_mfmtk()
@@ -62,23 +57,19 @@ class IllustrisCube(object):
 
         self.mfmtk = self.mfmtk.apply(pd.to_numeric, errors='ignore')
 
-    def color_mock(self, filter_list, cam, normalized=True):
-        if(normalized):
-            rgb_factor = 1
-            type = np.float32
-        else:
-            type = int
-            rgb_factor = 255
+    def color_mock(self, filter_list):
 
-        data = np.array([])
-        for i, filter in enumerate(filter_list):
-            if(i == 0):
-                data = self.get_slice(filter, cam=cam)
-            
-            if(i > 0):
-                data = np.dstack((data, self.get_slice(filter, cam=cam)))
+        if(len(filter_list) > 3):
+            filter_list = filter_list[0:3]
 
-        return data.astype(type)
+        R = self.get_slice(filter_list[0])
+        R = (R-R.min())/(R.max() - R.min()) * 255
+        G = self.get_slice(filter_list[1])
+        G = (G-G.min())/(G.max() - G.min()) * 255
+        B = self.get_slice(filter_list[2])
+        B = (B-B.min())/(B.max() - B.min()) * 255
+
+        return np.dstack((R, G, B))
 
     def parse_path(self):
         split_path = self.path.split('/')
@@ -86,7 +77,7 @@ class IllustrisCube(object):
         self.filename = split_path[-1]
         self.snapshot = split_path[-1].split('_')[0]
         self.zf = zs_dict[self.snapshot]
-        self.subfind = split_path[-1].split('_')[1].split('.fits')[0]
+        self.subfind = split_path[-1].split('_')[0].split('.fits')
 
     def in_Jy(self, data):
         return data * self.px_in_sr / 1e6
@@ -121,17 +112,8 @@ class IllustrisCube(object):
         else:
             raise NotImplementedError
 
-    def get_SED(self):
-
-        subhalo = get(self.url)
-        SED = get(subhalo['supplementary_data']['stellar_mocks']['sed'])
-        lambdas = SED['L_lambda']
-        vals = (SED['lambda_vals'] * u.m).to(u.angstrom)
-        return (lambdas, vals)
 
 def artificial_redshift(data, z1, z2, d1, d2, ps1, ps2):
     scale_factor = (d1 * (1+z2) * ps1) / (d2 * (1+z1) * ps2)
     return zoom(data, scale_factor)
 
-def norm(data):
-    return (data-data.min())/(data.max() - data.min()) 

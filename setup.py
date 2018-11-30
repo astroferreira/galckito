@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='galckito',
-      version='0.01',
+      version='0.02',
       description='Package with utilities to work with Galaxy Mocks',
       url='http://github.com/astroferreira/galckito',
       author='Leonardo de Albernaz Ferreira',
