@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 """
-This distribution of cosmocalc is for running the Illustris Virtual Observatory/sunpy module by Paul Torrey, Greg Snyder, and Tyler Metivier
-
-
 Calculate useful values for a given cosmology.  This module uses code adapted
 from `CC.py`_ (`James Schombert`_) which is a Python version of the
 `Cosmology Calculator`_ (`Ned Wright`_).
