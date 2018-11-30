@@ -26,3 +26,11 @@ def get(path, params=None):
         return filename
 
     return r
+
+
+def norm(data):
+    '''
+        Normalize the image to range [0, 1].
+    '''
+    return (data-data.min())/(data.max() - data.min())
+
