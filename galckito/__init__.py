@@ -9,5 +9,4 @@ from .cosmocalc import cosmology
 from .rebbining import congrid
 
 from .image import IllustrisCube
-from .image import artificial_redshift
 

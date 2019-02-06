@@ -1,5 +1,5 @@
 import numpy as np
-from scipy import zoom
+from scipy.ndimage import zoom
 
 
 def z_rescale(data, z1, z2, d1, d2, ps1, ps2):
@@ -11,7 +11,8 @@ def z_rescale(data, z1, z2, d1, d2, ps1, ps2):
         http://esoads.eso.org/abs/2008ApJS..175..105B
     '''
     scale_factor = (d1 * (1+z2) * ps1) / (d2 * (1+z1) * ps2)
-    return zoom(data, scale_factor, prefilter=True)
+    dimming = 1/(1+z2)**4
+    return zoom(data, scale_factor, prefilter=True)*dimming, scale_factor
 
 
 def gaussian_psf(pixelscale, angularFWHM, shape):

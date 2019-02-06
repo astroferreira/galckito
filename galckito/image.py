@@ -1,4 +1,3 @@
-
 from .cosmocalc import cosmology
 from .realism import z_rescale
 from .constants import *
@@ -39,8 +38,9 @@ class IllustrisCube(object):
             try:
                 self.fits = fits.open(path)
                 self.npix = self.fits[14].data[0].shape[0]
+                self.center = int(self.npix/2)
                 self.fov = self.fits[2].header['linear_fov']
-                self.px_in_kpc = self.fov / self.npix
+                self.px_in_kpc = self.fov / self.npix 
                 self.z = 0.05
                 self.cosmology = cosmology(self.z)
                 self.cosmologyf = cosmology(self.zf)
@@ -54,7 +54,8 @@ class IllustrisCube(object):
             except (Exception, TypeError):
                 print('Error opening FITS')
 
-    def redshiftted(self, filter, target_pixelscale, cam):
+    
+    def redshiftted(self, filter, target_pixelscale, cam, Rp=None):
         '''
             
             Return redshiftted version of given slice with
@@ -68,12 +69,28 @@ class IllustrisCube(object):
             For a more detailed approach use FERENGI instead http://www.mpia.de/FERENGI/
 
         '''
-        return z_rescale(self.get_slice(filter, cam=cam),
-                         self.cosmology.redshift,
-                         self.cosmologyf.redshift,
-                         self.cosmology.lum_dist,
-                         self.cosmologyf.lum_dist,
-                         self.px_in_arcsec, target_pixelscale)
+        
+        data, scale_factor = z_rescale(self.get_slice(filter, cam=cam, Rp=Rp),
+                                        self.cosmology.redshift,
+                                        self.cosmologyf.redshift,
+                                        self.cosmology.lum_dist,
+                                        self.cosmologyf.lum_dist,
+                                        self.px_in_arcsec, target_pixelscale)
+
+
+        self.npix = data.shape[0]
+        
+        self.px_in_kpc = self.fov / self.npix
+
+        self.px_in_sr = (1e3 * self.px_in_kpc / 10.0)**2
+        self.px_in_arcsec = (self.px_in_kpc /
+                             self.cosmologyf.kpc_per_arcsec)
+
+
+        return data
+
+ 
+
 
     def load_mfmtk(self):
         '''
@@ -152,13 +169,21 @@ class IllustrisCube(object):
     def UVJ(self, cam=14):
         return color_color('ACS-F435', 'ACS_F606', 'ACS_F606', 'f125w')
 
-    def get_slice(self, filter_name, cam=14):
+    def get_slice(self, filter_name, cam=14, Rp=None):
         '''
             Gets a slice of the cube.
             This means the {cam}-13 orientation in {filter_name}
         '''
         filter = filter_dict[filter_name]
-        return self.fits[cam].data[filter]
+        data = self.fits[cam].data[filter]
+
+        if(Rp is not None):
+            min = int((self.center-2*Rp))
+            max = int((self.center+2*Rp))
+            
+            data = data[min:max, min:max]
+
+        return data
 
     def get_filter(self, filter_name):
         '''
@@ -180,3 +205,5 @@ class IllustrisCube(object):
         lambdas = SED['L_lambda']
         vals = (SED['lambda_vals'] * u.m).to(u.angstrom)
         return (lambdas, vals)
+
+

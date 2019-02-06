@@ -9,6 +9,7 @@ from astropy.visualization.mpl_normalize import ImageNormalize
 from matplotlib import pyplot as plt
 
 from .constants import filter_dict
+from .image import IllustrisCube
 
 import numpy as np
 
@@ -32,19 +33,31 @@ def filter_mosaic(cube):
     plt.subplots_adjust(hspace=0, wspace=-0.2)
 
 
-def gshow(data, ax=None):
+def gshow(data, ax=None, Rp=None, mode=None, title='', colorbar_label='', cmap='viridis'):
     '''
         Adaptation of pyplot.imshow with
         normalization and without ticks
     '''
+    f = None
     if(ax is None):
         f, ax = plt.subplots(1, 1)
-        ax.set_xticks([])
-        ax.set_yticks([])
+        
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_title(title)
+    if(isinstance(data, IllustrisCube)):
+        data = data.get_slice('ACS-F606', cam=14, Rp=Rp)
 
-    norm = simple_norm(data, 'sqrt', percent=99.9)
-    cs = ax.imshow(data, norm=norm, cmap='gist_gray_r', interpolation=None)
-    if(ax is None):
-        f.colorbar(cs)
+    if(mode == 'SB'):
+        cmap = 'viridis_r'
+        colorbar_label = '$mag \ / \ arcsec^2$'
+
+    cs = ax.imshow(data, cmap=cmap, interpolation=None)
+
+    
+
+    if(f is not None):
+        cb = f.colorbar(cs)
+        cb.set_label(colorbar_label, fontsize=17)
 
     return ax
